@@ -86,7 +86,11 @@ module.exports = (param: any): webpack.Configuration[] => {
 
     const debug = param && param.debug === "true";
     setBuildVariables(debug);
-    setMinify(debug);
+
+    // current uglify settings make it so I can't debug the main process easily
+    if(!debug) {
+        setMinify(debug);
+    }
 
     const config = [
         Object.assign({}, {
