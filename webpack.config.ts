@@ -2,6 +2,7 @@ import * as path from "path";
 import * as webpack from "webpack";
 
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
 
 const webpackConfig: webpack.Configuration = {
     mode: "none",
@@ -47,11 +48,45 @@ const setBuildVariables = (debug: boolean) => {
     }
 };
 
+const setMinify = (debug: boolean) => {
+    const minifyOpts = {
+        parallel: true,
+        cache: false,
+        sourceMap: debug,
+        uglifyOptions: {
+            ecma: 8,
+            warnings: false,
+            toplevel: true,
+            nameCache: null,
+            ie8: false,
+            keep_classnames: undefined,
+            keep_fnames: false,
+            safari10: false,
+            compress: {
+                drop_console: !debug,
+                drop_debugger: !debug,
+                ecma: 8
+            },
+            output: {
+                comments: false,
+                beautify: false,
+                ecma: 8,
+            },
+        }
+    };
+    if(webpackConfig && webpackConfig.plugins) {
+        webpackConfig.plugins.push(
+            new UglifyJsPlugin(minifyOpts)
+        );
+    }
+};
+
 module.exports = (param: any): webpack.Configuration[] => {
     console.log(`running webpack config with ${JSON.stringify(param)}`);
 
     const debug = param && param.debug === "true";
     setBuildVariables(debug);
+    setMinify(debug);
 
     const config = [
         Object.assign({}, {
