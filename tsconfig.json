@@ -1,0 +1,16 @@
+{
+    "compileOnSave": false,
+    "compilerOptions": {
+        "target": "esnext",
+        "moduleResolution": "node",
+        "pretty": true,
+        "allowSyntheticDefaultImports": true,
+        "strict": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "sourceMap": true,
+        "skipLibCheck": true,
+        "allowJs": true,
+        "jsx": "preserve"
+    }
+}
