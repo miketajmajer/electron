@@ -1,4 +1,7 @@
 dist/
 node_modules/
+__tests__/
 yarn.lock
 package-lock.json
+TEST-jest_junit.xml
+yarn-error.log
