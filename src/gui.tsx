@@ -1,5 +1,6 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
+import PropTypes from "prop-types";
 
 declare const __DEV__: boolean;
 
@@ -21,8 +22,24 @@ class TestComponent extends React.PureComponent<any, any> {
     render() {
         return (
             <div>
-                Node version: {process.versions.node}
-                Tick: {this.state.ticks}
+                <p>Node version: {process.versions.node}</p>
+                <p>Chromium version: {process.versions["chrome"]}</p>
+                <p>Tick: {this.state.ticks}</p>
+            </div>
+        );
+    }
+}
+
+// test plugin
+class MyComponent extends React.Component<any> {
+    static propTypes = {
+        className: PropTypes.string.isRequired
+    };
+
+    render() {
+        return (
+            <div className={this.props.className}>
+                <span>Hello World</span>
             </div>
         );
     }
@@ -30,7 +47,10 @@ class TestComponent extends React.PureComponent<any, any> {
 
 const host = document.getElementById("app");
 ReactDOM.render(
-    <TestComponent></TestComponent>,
+    <div>
+        <TestComponent/>
+        <MyComponent className="MyClass"/>
+    </div>,
     host);
 
 if(__DEV__) {

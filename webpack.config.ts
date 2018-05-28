@@ -48,6 +48,7 @@ const setBuildVariables = (debug: boolean) => {
     }
 };
 
+// @ts-ignore
 const setMinify = (debug: boolean) => {
     const minifyOpts = {
         parallel: true,
@@ -81,14 +82,29 @@ const setMinify = (debug: boolean) => {
     }
 };
 
-module.exports = (param: any): webpack.Configuration[] => {
-    console.log(`running webpack config with ${JSON.stringify(param)}`);
+const setEnv = (debug: boolean) => {
+    if(!debug) {
+        process.env["BABEL_ENV"] = "production";
+        process.env["NODE_ENV"] = "production";
+    }
+    else {
+        process.env["BABEL_ENV"] = "development";
+        process.env["NODE_ENV"] = "development";
+    }
+};
 
+module.exports = (param: any): webpack.Configuration[] => {
     const debug = param && param.debug === "true";
+    const minify = param && param.minify === "true";
+
+    console.log("running webpack config with:");
+    console.log(`   debug = ${debug}`);
+    console.log(`   minify =  ${minify}`);
+    setEnv(debug);
     setBuildVariables(debug);
 
     // current uglify settings make it so I can't debug the main process easily
-    if(!debug) {
+    if(minify) {
         setMinify(debug);
     }
 
@@ -98,7 +114,8 @@ module.exports = (param: any): webpack.Configuration[] => {
             devtool: debug ? "inline-source-map" : undefined,
             entry: {
                 main: "./src/main.ts"
-            }
+            },
+            stats: "errors-only"
         } as webpack.Configuration, webpackConfig),
         Object.assign({}, {
             target: "electron-renderer",
@@ -106,6 +123,7 @@ module.exports = (param: any): webpack.Configuration[] => {
             entry: {
                 gui: "./src/gui.tsx"
             },
+            stats: "errors-only",
             plugins: [new HtmlWebpackPlugin({
                 template: "src/index.template.html",
                 inject: "body",

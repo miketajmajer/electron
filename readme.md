@@ -11,6 +11,11 @@ Then execute the following from the Console tab of your running Electron app's d
 
 And than refresh or restart the renderer process, you can see a React tab added.
 
+## test todo
+add enzyme!
+
+https://hackernoon.com/testing-react-components-with-jest-and-enzyme-41d592c174f
+
 
 ## Links with extra information
 

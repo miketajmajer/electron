@@ -1,6 +1,35 @@
 {
-    "presets": [
-        "es2015-node",
-        "react"
-    ]
+    "env": {
+        "development": {
+            "presets": [
+                [
+                    "env", {
+                        "targets": {
+                            "node": "8.9",
+                            "chrome": 61
+                        },
+                        "modules": false,
+                        "debug": true
+                    }
+                ],
+                "react"
+            ]
+        },
+        "production": {
+            "presets": [
+                [
+                    "env", {
+                        "targets": {
+                            "node": "8.9",
+                            "chrome": 61
+                        },
+                        "modules": false,
+                        "debug": false
+                    }
+                ],
+                "react",
+                "react-optimize"
+            ]
+        }
+    }
 }
