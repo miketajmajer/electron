@@ -7,10 +7,9 @@
     "private": true,
     "scripts": {
         "build": "set TS_NODE_PROJECT=tsconfig-for-webpack-config.json&& webpack --config webpack.config.ts --env.debug=true",
-        "build:prod": "set TS_NODE_PROJECT=tsconfig-for-webpack-config.json&& webpack --config webpack.config.ts --env.debug=false",
-        "xbuild": "set NODE_ENV=development&& set BABEL_ENV=development&& set TS_NODE_PROJECT=tsconfig-for-webpack-config.json&& webpack --config webpack.config.ts --env.debug=true",
+        "build:prod": "set TS_NODE_PROJECT=tsconfig-for-webpack-config.json&& webpack --config webpack.config.ts --env.debug=false --env.minify=true",
         "watch": "set TS_NODE_PROJECT=tsconfig-for-webpack-config.json&& webpack --config webpack.config.ts --env.debug=true -w",
-        "prestart": "yarn run build",
+        "prexstart": "yarn run build",
         "start": "./node_modules/.bin/electron ./dist/main.js",
         "pretest": "set TS_NODE_PROJECT=tsconfig-for-webpack-config.json&& webpack --config webpack.tests.config.ts",
         "test": "jest"

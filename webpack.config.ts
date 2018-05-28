@@ -99,7 +99,7 @@ module.exports = (param: any): webpack.Configuration[] => {
 
     console.log("running webpack config with:");
     console.log(`   debug = ${debug}`);
-    console.log(`   minify =  ${minify}`);
+    console.log(`   minify = ${minify}`);
     setEnv(debug);
     setBuildVariables(debug);
 
