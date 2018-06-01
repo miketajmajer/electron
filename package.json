@@ -6,7 +6,7 @@
     "license": "MIT",
     "private": true,
     "scripts": {
-        "build": "set TS_NODE_PROJECT=tsconfig-for-webpack-config.json&& webpack --config webpack.config.ts --env.debug=true",
+        "build": "set TS_NODE_PROJECT=tsconfig-for-webpack-config.json&& webpack --config webpack.config.ts --display-error-details --env.debug=true",
         "build:prod": "set TS_NODE_PROJECT=tsconfig-for-webpack-config.json&& webpack --config webpack.config.ts --env.debug=false --env.minify=true",
         "watch": "set TS_NODE_PROJECT=tsconfig-for-webpack-config.json&& webpack --config webpack.config.ts --env.debug=true -w",
         "prexstart": "yarn run build",

@@ -86,8 +86,7 @@ const setEnv = (debug: boolean) => {
     if(!debug) {
         process.env["BABEL_ENV"] = "production";
         process.env["NODE_ENV"] = "production";
-    }
-    else {
+    } else {
         process.env["BABEL_ENV"] = "development";
         process.env["NODE_ENV"] = "development";
     }
@@ -109,27 +108,29 @@ module.exports = (param: any): webpack.Configuration[] => {
     }
 
     const config = [
-        Object.assign({}, {
+        Object.assign({}, webpackConfig, {
             target: "electron-main",
             devtool: debug ? "inline-source-map" : undefined,
             entry: {
                 main: "./src/main.ts"
             },
             stats: "errors-only"
-        } as webpack.Configuration, webpackConfig),
-        Object.assign({}, {
+        } as webpack.Configuration),
+        Object.assign({}, webpackConfig, {
             target: "electron-renderer",
             devtool: debug ? "inline-source-map" : undefined,
             entry: {
                 gui: "./src/gui.tsx"
             },
             stats: "errors-only",
-            plugins: [new HtmlWebpackPlugin({
-                template: "src/index.template.html",
-                inject: "body",
-                title: "Electron Test"
-            })]
-        } as webpack.Configuration, webpackConfig)
+            plugins: [
+                new HtmlWebpackPlugin({
+                    template: "src/index.template.html",
+                    inject: "body",
+                    title: "Electron Test"
+                })
+            ]
+        } as webpack.Configuration)
     ];
 
     return config;

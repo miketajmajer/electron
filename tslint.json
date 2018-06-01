@@ -45,9 +45,10 @@
         "one-line": [true,
             "check-open-brace",
             "check-catch",
-            "check-else",
             "check-whitespace"
         ],
+        // "brace-style": {
+        // },
         "quotemark": [true, "double"],
         "radix": true,
         "semicolon": true,
