@@ -16,12 +16,14 @@ const readDirRecursiveSync = (folder: string, filter: (v: string) => RegExpMatch
 };
 
 const getEntries = (folder: string) =>
-    readDirRecursiveSync(folder, f => f.match(/.*(tests|specs)\.tsx?$/))
+    readDirRecursiveSync(folder, f => f.match(/.*\.spec\.tsx?$/))
         .map((file: string) => {
-            return {
+            const r = {
                 name: path.basename(file, path.extname(file)),
                 path: path.resolve(file)
             };
+            //console.log(`test scan: ${JSON.stringify(r, null, 2)}`);
+            return r;
         }
     ).reduce((memo: any, file: any) => {
         memo[file.name] = file.path;
@@ -29,8 +31,7 @@ const getEntries = (folder: string) =>
     }, {});
 
 module.exports = [
-    Object.assign({}, webPack[0], {entry: getEntries("./tests/host/")}),
-    Object.assign({}, webPack[0], {entry: getEntries("./tests/gui/")})
+    Object.assign({}, webPack[0], {entry: getEntries("./src")})
 ].map(s => {
     s.output.path = path.resolve(__dirname, "__tests__");
     return s;

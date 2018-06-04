@@ -2,5 +2,10 @@
     "compilerOptions": {
         "module": "commonjs",
         "target": "es2017"
-    }
+    },
+    "exclude": [
+        "src",
+        "dist",
+        "node_modules"
+    ]
 }

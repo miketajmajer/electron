@@ -12,5 +12,10 @@
         "skipLibCheck": true,
         "allowJs": true,
         "jsx": "preserve"
-    }
+    },
+    "exclude": [
+        "webpack.config.ts",
+        "webpack.tests.config.ts",
+        "node_modules"
+    ]
 }
