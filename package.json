@@ -72,12 +72,16 @@
         "react-dom": "^16.4.0"
     },
     "jest": {
+        "verbose": true,
         "testRegex": "/__tests__/.*\\.jsx?",
         "reporters": [
             "default",
             "jest-junit"
         ],
-        "testPathIgnorePatterns" : ["/node_modules/", "/TestApp-win32-x64/" ],
+        "testPathIgnorePatterns" : [
+            "<rootDir>/node_modules/",
+            "<rootDir>/TestApp-win32-x64/"
+        ],
         "snapshotSerializers": [
             "enzyme-to-json/serializer"
         ]
