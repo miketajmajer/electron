@@ -1,8 +1,28 @@
 import * as path from "path";
 import * as webpack from "webpack";
 
+const chalk = require("chalk");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
+const BabiliPlugin = require("babili-webpack-plugin");
+
+// needed for: DeprecationWarning: Tapable.plugin is deprecated. Use new API on `.hooks` instead
+// see: https://nodejs.org/api/util.html
+(process as any).noDeprecation = true;
+
+interface IAppGlobal {
+    startDate: Date;
+    buildCount: number;
+}
+
+declare global {
+    namespace NodeJS {
+        interface Global {
+            app: IAppGlobal;
+        }
+    }
+}
+
+declare const global: NodeJS.Global;
 
 const webpackConfig: webpack.Configuration = {
     mode: "none",
@@ -38,9 +58,9 @@ const webpackConfig: webpack.Configuration = {
     plugins: []
 };
 
-const setBuildVariables = (debug: boolean) => {
-    if(webpackConfig && webpackConfig.plugins) {
-        webpackConfig.plugins.push(
+const setBuildVariables = (debug: boolean, config: webpack.Configuration) => {
+    if(config && config.plugins) {
+        config.plugins.push(
             new webpack.DefinePlugin({
                 __DEV__: JSON.stringify(debug)
             })
@@ -48,36 +68,46 @@ const setBuildVariables = (debug: boolean) => {
     }
 };
 
-// @ts-ignore
-const setMinify = (debug: boolean) => {
-    const minifyOpts = {
-        parallel: true,
-        cache: false,
-        sourceMap: debug,
-        uglifyOptions: {
-            ecma: 8,
-            warnings: false,
-            toplevel: true,
-            nameCache: null,
-            ie8: false,
-            keep_classnames: undefined,
-            keep_fnames: false,
-            safari10: false,
-            compress: {
-                drop_console: !debug,
-                drop_debugger: !debug,
-                ecma: 8
-            },
-            output: {
-                comments: false,
-                beautify: false,
-                ecma: 8,
-            },
-        }
-    };
-    if(webpackConfig && webpackConfig.plugins) {
-        webpackConfig.plugins.push(
-            new UglifyJsPlugin(minifyOpts)
+const setMinify = (debug: boolean, config: webpack.Configuration) => {
+    if(config && config.plugins) {
+        config.plugins.push(
+            new BabiliPlugin({
+                "mangle": false,
+                "removeConsole": !debug,
+                "removeDebugger": !debug,
+                "deadcode": true
+            }, {
+                "comments": false
+            })
+        );
+    }
+};
+
+const setPlugins = (config: webpack.Configuration) => {
+    if(config && config.plugins) {
+        config.plugins.push(
+            function(this: any) {
+                this.plugin("run", function(_compiler: any, callback: any) {
+                    global.app.startDate = new Date();
+                    console.log(chalk.green.bold(`\n${global.app.buildCount}: Start compile ${global.app.startDate.toTimeString().split(" ")[0]}`));
+                    console.log(chalk.green.bold(JSON.stringify(Object.keys(_compiler.options.entry).join(", "), null, 2)));
+                    callback();
+                });
+
+                this.plugin("watch-run", function(_watching: any, callback: any) {
+                    global.app.startDate = new Date();
+                    console.log(chalk.green.bold(`\n${global.app.buildCount}: Watch-start compile ${global.app.startDate.toTimeString().split(" ")[0]}`));
+                    console.log(chalk.green.bold(JSON.stringify(Object.keys(_watching.options.entry).join(", "), null, 2)));
+                    callback();
+                });
+
+                this.plugin("done", function(_stats: any) {
+                    let curDate = new Date();
+                    let diff = (curDate.getTime() - global.app.startDate.getTime()) / 1000.0;
+                    console.log(chalk.green.bold(`\n${global.app.buildCount++}: End compile ${diff} seconds`));
+                    console.log(chalk.green.bold(JSON.stringify(Object.keys(_stats.compilation.options.entry).join(", "), null, 2)));
+                });
+            }
         );
     }
 };
@@ -93,19 +123,21 @@ const setEnv = (debug: boolean) => {
 };
 
 module.exports = (param: any): webpack.Configuration[] => {
+    debugger;
+
     const debug = param && param.debug === "true";
     const minify = param && param.minify === "true";
+
+    // build status
+    global.app = {
+        startDate: null,
+        buildCount: 1,
+    };
 
     console.log("running webpack config with:");
     console.log(`   debug = ${debug}`);
     console.log(`   minify = ${minify}`);
     setEnv(debug);
-    setBuildVariables(debug);
-
-    // current uglify settings make it so I can't debug the main process easily
-    if(minify) {
-        setMinify(debug);
-    }
 
     const config = [
         Object.assign({}, webpackConfig, {
@@ -132,6 +164,13 @@ module.exports = (param: any): webpack.Configuration[] => {
             ]
         } as webpack.Configuration)
     ];
+
+    if(minify) {
+        config.forEach(c => setMinify(debug, c));
+    }
+
+    config.forEach(c => setBuildVariables(debug, c));
+    config.forEach(c => setPlugins(c));
 
     return config;
 };

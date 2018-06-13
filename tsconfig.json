@@ -14,8 +14,11 @@
         "jsx": "preserve"
     },
     "exclude": [
+        "__tests__",
+        "dist",
+        "node_modules",
+        "TestApp-win32-x64",
         "webpack.config.ts",
-        "webpack.tests.config.ts",
-        "node_modules"
+        "webpack.tests.config.ts"
     ]
 }

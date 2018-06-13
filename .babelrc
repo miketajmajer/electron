@@ -9,7 +9,7 @@
                             "chrome": 61
                         },
                         "modules": false,
-                        "debug": true
+                        "debug": false
                     }
                 ],
                 "react"

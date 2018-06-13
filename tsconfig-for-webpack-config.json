@@ -4,9 +4,13 @@
         "target": "es2017"
     },
     "exclude": [
-        "src",
-        "dist",
         "__tests__",
-        "node_modules"
+        "dist",
+        "node_modules",
+        "node_modules",
+        "src",
+        "TestApp-win32-x64",
+        "webpack.config.ts",
+        "webpack.tests.config.ts"
     ]
 }
