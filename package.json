@@ -73,7 +73,7 @@
     },
     "jest": {
         "verbose": true,
-        "testRegex": "/__tests__/.*\\.jsx?",
+        "testRegex": "/__tests__/.*\\.jsx?$",
         "reporters": [
             "default",
             "jest-junit"
