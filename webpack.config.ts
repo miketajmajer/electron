@@ -135,7 +135,9 @@ const setEnv = (debug: boolean) => {
 };
 
 module.exports = (param: any): webpack.Configuration[] => {
-    debugger;
+    if(param && param.break) {
+        debugger;
+    }
 
     const debug = param && param.debug === "true";
     const minify = param && param.minify === "true";
