@@ -16,7 +16,8 @@
         "pretest": "set TS_NODE_PROJECT=tsconfig-for-webpack-config.json&& webpack --config webpack.tests.config.ts",
         "test": "jest",
         "prepackage": "yarn run build:prod",
-        "package": "electron-packager . TestApp --platform=win32 --arch=x64 --overwrite"
+        "package": "electron-builder --dir",
+        "makedist": "electron-builder"
     },
     "devDependencies": {
         "@types/electron": "^1.6.10",
@@ -40,10 +41,11 @@
         "babel-preset-es2015-node": "^6.1.1",
         "babel-preset-react": "^6.24.1",
         "babel-preset-react-optimize": "^1.0.1",
-        "babili-webpack-plugin": "^0.1.2",
+        "babili-webpack-plugin": "=0.1.1",
+        "brotli-webpack-plugin": "^1.0.0",
         "chalk": "^2.4.1",
         "electron": "^2.0.2",
-        "electron-packager": "^12.1.0",
+        "electron-builder": "^20.15.1",
         "electron-react-devtools": "^0.5.3",
         "enzyme": "^3.3.0",
         "enzyme-adapter-react-16": "^1.1.1",
@@ -71,6 +73,15 @@
         "react": "^16.4.0",
         "react-dom": "^16.4.0"
     },
+    "build": {
+        "appId": "com.test.application",
+        "files": [
+            "dist/**/*"
+        ],
+        "directories": {
+            "output": "package"
+        }
+    },
     "jest": {
         "verbose": true,
         "testRegex": "/__tests__/.*\\.jsx?$",
@@ -78,7 +89,7 @@
             "default",
             "jest-junit"
         ],
-        "testPathIgnorePatterns" : [
+        "testPathIgnorePatterns": [
             "<rootDir>/node_modules/",
             "<rootDir>/TestApp-win32-x64/"
         ],

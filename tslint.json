@@ -47,8 +47,7 @@
             "check-catch",
             "check-whitespace"
         ],
-        // "brace-style": {
-        // },
+        "brace-style": false,
         "quotemark": [true, "double"],
         "radix": true,
         "semicolon": true,

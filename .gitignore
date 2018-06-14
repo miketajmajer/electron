@@ -6,4 +6,4 @@ package-lock.json
 TEST-jest_junit.xml
 yarn-error.log
 NpmPack/
-TestApp-win32-x64/
+package/

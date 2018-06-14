@@ -68,6 +68,7 @@ const setBuildVariables = (debug: boolean, config: webpack.Configuration) => {
     }
 };
 
+// no sourcemaps with minify (issue with Babili) - debug leaves the console logs in place
 const setMinify = (debug: boolean, config: webpack.Configuration) => {
     if(config && config.plugins) {
         config.plugins.push(
@@ -75,15 +76,15 @@ const setMinify = (debug: boolean, config: webpack.Configuration) => {
                 "mangle": false,
                 "removeConsole": !debug,
                 "removeDebugger": !debug,
-                "deadcode": true
+                "deadcode": true,
             }, {
-                "comments": false
+                //"comments": false, // default leaves license info in place
             })
         );
     }
 };
 
-const setPlugins = (config: webpack.Configuration) => {
+const setPlugins = (debug: boolean, config: webpack.Configuration) => {
     if(config && config.plugins) {
         config.plugins.push(
             function(this: any) {
@@ -108,6 +109,17 @@ const setPlugins = (config: webpack.Configuration) => {
                     console.log(chalk.green.bold(JSON.stringify(Object.keys(_stats.compilation.options.entry).join(", "), null, 2)));
                 });
             }
+        );
+    }
+};
+
+const setSourceMaps = (config: webpack.Configuration) => {
+    if(config && config.plugins) {
+        config.plugins.push(
+            new webpack.SourceMapDevToolPlugin({
+                filename: null, // if no value is provided the sourcemap is inlined
+                test: /\.(ts(x?)|js(x?))($|\?)/i
+            })
         );
     }
 };
@@ -142,7 +154,7 @@ module.exports = (param: any): webpack.Configuration[] => {
     const config = [
         Object.assign({}, webpackConfig, {
             target: "electron-main",
-            devtool: debug ? "inline-source-map" : undefined,
+            //devtool: debug ? "inline-source-map" : undefined, // using plugin
             entry: {
                 main: "./src/main.ts"
             },
@@ -150,7 +162,7 @@ module.exports = (param: any): webpack.Configuration[] => {
         } as webpack.Configuration),
         Object.assign({}, webpackConfig, {
             target: "electron-renderer",
-            devtool: debug ? "inline-source-map" : undefined,
+            //devtool: debug ? "inline-source-map" : undefined, // using plugin
             entry: {
                 gui: "./src/gui.tsx"
             },
@@ -168,9 +180,12 @@ module.exports = (param: any): webpack.Configuration[] => {
     if(minify) {
         config.forEach(c => setMinify(debug, c));
     }
+    else if(debug) {
+        config.forEach(c => setSourceMaps(c));
+    }
 
     config.forEach(c => setBuildVariables(debug, c));
-    config.forEach(c => setPlugins(c));
+    config.forEach(c => setPlugins(debug, c));
 
     return config;
 };
