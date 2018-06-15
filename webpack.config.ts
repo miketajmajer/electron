@@ -113,14 +113,16 @@ const setPlugins = (debug: boolean, config: webpack.Configuration) => {
     }
 };
 
-const setSourceMaps = (config: webpack.Configuration) => {
-    if(config && config.plugins) {
-        config.plugins.push(
-            new webpack.SourceMapDevToolPlugin({
-                filename: null, // if no value is provided the sourcemap is inlined
-                test: /\.(ts(x?)|js(x?))($|\?)/i
-            })
-        );
+const setSourceMaps = (debug: boolean, config: webpack.Configuration) => {
+    if(config) {
+        // sourcemaps can use plugin or devtool
+        config.devtool = debug ? "inline-source-map" : "nosources-source-map";
+        // config.plugins.push(
+        //     new webpack.SourceMapDevToolPlugin({
+        //         filename: null, // if no value is provided the sourcemap is inlined
+        //         test: /\.(ts(x?)|js(x?))($|\?)/i
+        //     })
+        // );
     }
 };
 
@@ -156,7 +158,6 @@ module.exports = (param: any): webpack.Configuration[] => {
     const config = [
         Object.assign({}, webpackConfig, {
             target: "electron-main",
-            //devtool: debug ? "inline-source-map" : undefined, // using plugin
             entry: {
                 main: "./src/main.ts"
             },
@@ -164,7 +165,6 @@ module.exports = (param: any): webpack.Configuration[] => {
         } as webpack.Configuration),
         Object.assign({}, webpackConfig, {
             target: "electron-renderer",
-            //devtool: debug ? "inline-source-map" : undefined, // using plugin
             entry: {
                 gui: "./src/gui.tsx"
             },
@@ -182,10 +182,7 @@ module.exports = (param: any): webpack.Configuration[] => {
     if(minify) {
         config.forEach(c => setMinify(debug, c));
     }
-    else if(debug) {
-        config.forEach(c => setSourceMaps(c));
-    }
-
+    config.forEach(c => setSourceMaps(debug, c));
     config.forEach(c => setBuildVariables(debug, c));
     config.forEach(c => setPlugins(debug, c));
 
