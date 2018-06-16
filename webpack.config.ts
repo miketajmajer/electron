@@ -56,6 +56,33 @@ const webpackConfig: webpack.Configuration = {
             //         emitErrors: true
             //     }
             // },
+            // {
+            //     test: /\.tsx?$/,
+            //     exclude: /node_modules/,
+            //     use: [
+            //         {
+            //             loader: "babel-loader",
+            //         },
+            //         {
+            //             loader: "ts-loader",
+            //             query: {
+            //                 transpileOnly: true,
+            //                 configFile: path.resolve(__dirname, "tsconfig.json"),
+            //                 logLevel: "info"
+            //             }
+            //         }
+            //     ]
+            // },
+            // {
+            //     test: /\.jsx?$/,
+            //     exclude: /node_modules/,
+            //     use:  [
+            //         {
+            //             loader: "babel-loader"
+            //         }
+            //     ]
+            // }
+            // HappyPack
             {
                 test: /\.tsx?$/,
                 exclude: /node_modules/,
@@ -93,8 +120,10 @@ const setMinify = (debug: boolean, config: webpack.Configuration) => {
                 "removeConsole": !debug,
                 "removeDebugger": !debug,
                 "deadcode": true,
+                "keepFnName": true
             }, {
                 //"comments": false, // default leaves license info in place
+                //sourceMap: "nosources-source-map"
             })
         );
     }
@@ -195,10 +224,11 @@ const setPlugins = (debug: boolean, config: webpack.Configuration) => {
 const setSourceMaps = (debug: boolean, config: webpack.Configuration) => {
     if(config) {
         // sourcemaps can use plugin or devtool
-        config.devtool = debug ? "inline-source-map" : "nosources-source-map";
+        config.devtool = debug ? "source-map" : undefined;
+
         // config.plugins.push(
         //     new webpack.SourceMapDevToolPlugin({
-        //         filename: null, // if no value is provided the sourcemap is inlined
+        //         filename: "[name].js.map", // (null) if no value is provided the sourcemap is inlined
         //         test: /\.(ts(x?)|js(x?))($|\?)/i
         //     })
         // );
