@@ -1,9 +1,16 @@
 import * as path from "path";
 import * as webpack from "webpack";
 
+const os = require("os");
 const chalk = require("chalk");
+
+// plugins
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const BabiliPlugin = require("babili-webpack-plugin");
+const HappyPack = require("happypack");
+const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
+const HardSourceWebpackPlugin = require("hard-source-webpack-plugin");
+const CleanWebpackPlugin = require("clean-webpack-plugin");
 
 // needed for: DeprecationWarning: Tapable.plugin is deprecated. Use new API on `.hooks` instead
 // see: https://nodejs.org/api/util.html
@@ -24,8 +31,13 @@ declare global {
 
 declare const global: NodeJS.Global;
 
+const tsThreads = Math.max(5, os.cpus().length / 2);
+const jsThreads = 2;
+const checkerThreads = 2;
+
 const webpackConfig: webpack.Configuration = {
     mode: "none",
+    cache: true,
     node: {
         __dirname: false
     },
@@ -34,23 +46,27 @@ const webpackConfig: webpack.Configuration = {
         filename: "[name].js"
     },
     module: {
-        rules: [{
-            test: /\.ts$/,
-            enforce: "pre",
-            loader: "tslint-loader",
-            options: {
-                typeCheck: true,
-                emitErrors: true
+        rules: [
+            // {
+            //     test: /\.ts$/,
+            //     enforce: "pre",
+            //     loader: "tslint-loader",
+            //     options: {
+            //         typeCheck: true,
+            //         emitErrors: true
+            //     }
+            // },
+            {
+                test: /\.tsx?$/,
+                exclude: /node_modules/,
+                use: "happypack/loader?id=ts"
+            },
+            {
+                test: /\.jsx?$/,
+                exclude: /node_modules/,
+                use: "happypack/loader?id=js"
             }
-        }, {
-            test: /\.tsx?$/,
-            exclude: /node_modules/,
-            loaders: ["babel-loader", "ts-loader" ]
-        }, {
-            test: /\.jsx?$/,
-            exclude: /node_modules/,
-            loader: "babel-loader"
-        }]
+        ]
     },
     resolve: {
         extensions: [".js", ".ts", ".tsx", ".jsx", ".json"]
@@ -110,6 +126,69 @@ const setPlugins = (debug: boolean, config: webpack.Configuration) => {
                 });
             }
         );
+
+        config.plugins.push(new HappyPack({
+            id: "ts",
+            threads: tsThreads,
+            loaders: [
+                {
+                    path: "babel-loader",
+                },
+                {
+                    path: "ts-loader",
+                    query: {
+                        transpileOnly: true,
+                        happyPackMode: true,
+                        configFile: path.resolve(__dirname, "tsconfig.json"),
+                        logLevel: "info"
+                    }
+                }
+            ]
+        }));
+
+        config.plugins.push(new HappyPack({
+            id: "js",
+            threads: jsThreads,
+            loaders: [
+                {
+                    path: "babel-loader"
+                }
+            ]
+        }));
+
+        config.plugins.push(new HardSourceWebpackPlugin({
+            // Either an absolute path or relative to webpack's options.context.
+            cacheDirectory: path.resolve(__dirname, "node_modules/.cache/hard-source/[confighash]"),
+
+            // Either a string of object hash function given a webpack config.
+            configHash: (webpackConfig: webpack.Configuration) => {
+                // node-object-hash on npm can be used to build this.
+                return require("node-object-hash")({sort: false}).hash(webpackConfig);
+            },
+
+            // Either false, a string, an object, or a project hashing function.
+            environmentHash: {
+                root: process.cwd(),
+                directories: [],
+                files: ["package.json", "yarn.lock", "webpack.config.ts", "webpack.tests.config.ts"],
+            },
+            // An object.
+            info: {
+                // 'none' or 'test'.
+                mode: "test",
+                // 'debug', 'log', 'info', 'warn', or 'error'.
+                level: "log",
+            }
+        }));
+
+        config.plugins.push(new ForkTsCheckerWebpackPlugin({
+            checkSyntacticErrors: true,
+            tsconfig: path.resolve(__dirname, "tsconfig.json"),
+            workers: checkerThreads,
+            watch: [ "src" ]
+        }));
+
+        config.plugins.push(new CleanWebpackPlugin("dist"));
     }
 };
 

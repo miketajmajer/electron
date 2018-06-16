@@ -19,3 +19,4 @@ app.on("ready", () => onReady());
 app.on("window-all-closed", () => app.quit());
 
 console.log(`Electron Version ${app.getVersion()}`);
+console.log("Node Version: " + process.version);

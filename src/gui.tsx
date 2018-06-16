@@ -9,7 +9,7 @@ class TestComponent extends React.PureComponent<any, any> {
         super(props);
 
         this.state = {
-            ticks: 0
+            ticks: 0,
         };
 
         setInterval(() => {
