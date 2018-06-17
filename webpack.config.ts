@@ -47,6 +47,7 @@ const webpackConfig: webpack.Configuration = {
     },
     module: {
         rules: [
+            // The Forked Checker takes the place of this
             // {
             //     test: /\.ts$/,
             //     enforce: "pre",
@@ -56,6 +57,7 @@ const webpackConfig: webpack.Configuration = {
             //         emitErrors: true
             //     }
             // },
+            // The original (no HappyPack) loaders for ts/js
             // {
             //     test: /\.tsx?$/,
             //     exclude: /node_modules/,
@@ -82,7 +84,8 @@ const webpackConfig: webpack.Configuration = {
             //         }
             //     ]
             // }
-            // HappyPack
+
+            // HappyPack Versions
             {
                 test: /\.tsx?$/,
                 exclude: /node_modules/,
@@ -122,10 +125,14 @@ const setMinify = (debug: boolean, config: webpack.Configuration) => {
                 "deadcode": true,
                 "keepFnName": true
             }, {
-                //"comments": false, // default leaves license info in place
-                //sourceMap: "nosources-source-map"
+                //"comments": false -- remove all comments.  Use the default, it leaves license info in place
+                //sourceMap: "nosources-source-map" - by default this will use the devtools setting
+                sourceMap: false
             })
         );
+
+        // fix sourcemap bug by forcing the plugin to use v1.0.1 (not 1.1!)
+        config.plugins.push(new CleanWebpackPlugin("node_modules/babili-webpack-plugin/webpack-sources"));
     }
 };
 
@@ -224,8 +231,9 @@ const setPlugins = (debug: boolean, config: webpack.Configuration) => {
 const setSourceMaps = (debug: boolean, config: webpack.Configuration) => {
     if(config) {
         // sourcemaps can use plugin or devtool
-        config.devtool = debug ? "source-map" : undefined;
+        config.devtool = debug ? "source-map" : false;
 
+        // the plugin gives you much more control
         // config.plugins.push(
         //     new webpack.SourceMapDevToolPlugin({
         //         filename: "[name].js.map", // (null) if no value is provided the sourcemap is inlined
@@ -288,12 +296,12 @@ module.exports = (param: any): webpack.Configuration[] => {
         } as webpack.Configuration)
     ];
 
-    if(minify) {
-        config.forEach(c => setMinify(debug, c));
-    }
     config.forEach(c => setSourceMaps(debug, c));
     config.forEach(c => setBuildVariables(debug, c));
     config.forEach(c => setPlugins(debug, c));
+    if(minify) {
+        config.forEach(c => setMinify(debug, c));
+    }
 
     return config;
 };

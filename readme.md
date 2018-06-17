@@ -1,8 +1,31 @@
-# Electron sample with typescript tooling
+# Electron Sample with Typescript Tooling
 
-## HappyPack seems broken :-( with newest version of webpack
+## A webpack configuration for high performance
 
-## react dev tools for electron:
+### Webpack using TypeScript Config
+
+Using ts-node makes this pretty easy.
+
+Have debug-build target to debug the webpack config.
+
+### TypeScript build speed
+
+Using ts-loader with HappyPack for multi-treaded builds.  Using HardSource webpack-plugin for caching.
+
+### Deadcode and such
+Using Babili to minimize and (more importantly) to remove dead code.  I'm generating ES2018, and this does a good job with it.
+
+Babili doesn't work with sourcemaps - the maps are there, but are broken.
+
+### Bugs
+    Need to set this version of webpack-sources to fix an issue with sourcemap build
+    "webpack-sources": "1.0.1"
+
+### Testing
+
+Using Jest with Enzyme (snapshots!).
+
+## Note: how to use react dev tools for electron:
 https://github.com/firejune/electron-react-devtools
 
 Then execute the following from the Console tab of your running Electron app's developer tools:
@@ -11,13 +34,7 @@ Then execute the following from the Console tab of your running Electron app's d
 
 And than refresh or restart the renderer process, you can see a React tab added.
 
-## test todo
-add enzyme!
-
-https://hackernoon.com/testing-react-components-with-jest-and-enzyme-41d592c174f
-
-
-## Links with extra information
+## Some Links that I pulled information from
 
 https://blog.scottlogic.com/2017/06/06/typescript-electron-webpack.html
 
