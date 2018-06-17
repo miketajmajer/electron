@@ -139,22 +139,22 @@ const setMinify = (debug: boolean, config: webpack.Configuration) => {
 const setPlugins = (debug: boolean, config: webpack.Configuration) => {
     if(config && config.plugins) {
         config.plugins.push(
-            function(this: any) {
-                this.plugin("run", function(_compiler: any, callback: any) {
+            function () {
+                this.plugin("run", (_compiler: any, callback: any) => {
                     global.app.startDate = new Date();
                     console.log(chalk.green.bold(`\n${global.app.buildCount}: Start compile ${global.app.startDate.toTimeString().split(" ")[0]}`));
                     console.log(chalk.green.bold(JSON.stringify(Object.keys(_compiler.options.entry).join(", "), null, 2)));
                     callback();
                 });
 
-                this.plugin("watch-run", function(_watching: any, callback: any) {
+                this.plugin("watch-run", (_watching: any, callback: any) => {
                     global.app.startDate = new Date();
                     console.log(chalk.green.bold(`\n${global.app.buildCount}: Watch-start compile ${global.app.startDate.toTimeString().split(" ")[0]}`));
                     console.log(chalk.green.bold(JSON.stringify(Object.keys(_watching.options.entry).join(", "), null, 2)));
                     callback();
                 });
 
-                this.plugin("done", function(_stats: any) {
+                this.plugin("done", (_stats: any) => {
                     let curDate = new Date();
                     let diff = (curDate.getTime() - global.app.startDate.getTime()) / 1000.0;
                     console.log(chalk.green.bold(`\n${global.app.buildCount++}: End compile ${diff} seconds`));
