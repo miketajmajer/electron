@@ -111,6 +111,33 @@ const setBuildVariables = (debug: boolean, config: webpack.Configuration) => {
                 __DEV__: JSON.stringify(debug)
             })
         );
+
+        config.mode = "none";
+        config.performance = !debug ? {
+            assetFilter: undefined,
+            hints: undefined,
+            maxEntrypointSize: undefined,
+            maxAssetSize: undefined }
+            : undefined;
+
+        config.optimization = !debug ? {
+            concatenateModules: true,
+            flagIncludedChunks: true,
+            minimize: false, // we run babili as a plugin
+            namedChunks: false,
+            namedModules: false,
+            nodeEnv: "production",
+            noEmitOnErrors: true,
+            occurrenceOrder: true,
+            //portableRecords: true, // not quite sure what this does!
+            providedExports: true,
+            removeAvailableModules: true,
+            removeEmptyChunks: true,
+            //runtimeChunk: { name: "runtime", },
+            sideEffects: true,
+            //splitChunks: { name: "splitchunk", },
+            usedExports: true,
+        } : undefined;
     }
 };
 
@@ -123,7 +150,6 @@ const setMinify = (debug: boolean, config: webpack.Configuration) => {
                 "removeConsole": !debug,
                 "removeDebugger": !debug,
                 "deadcode": true,
-                "keepFnName": true
             }, {
                 //"comments": false -- remove all comments.  Use the default, it leaves license info in place
                 //sourceMap: "nosources-source-map" - by default this will use the devtools setting
@@ -225,6 +251,10 @@ const setPlugins = (debug: boolean, config: webpack.Configuration) => {
         }));
 
         config.plugins.push(new CleanWebpackPlugin("dist"));
+
+        if(!debug) {
+            config.plugins.push(new webpack.optimize.ModuleConcatenationPlugin());
+        }
     }
 };
 
